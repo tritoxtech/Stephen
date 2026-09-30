@@ -184,7 +184,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     </div>
   </div>
 
-  <p style="color:var(--text2);font-size:13px;line-height:1.8;margin-bottom:20px">Stephen rules: Effective date +7 days · Anti-theft Yes · Unstacked · 2018+ Comprehensive/Collision $1,000 and rental value required · Farmers roadside Standard / BW roadside Yes · Farmers only: Auto/Home/Condo Yes and remove Signal by Farmers · No fixed Bodily Injury, Property Damage, UM/UIM or PIP checks. Other checks follow Mirvat; 2017 and older remain PLPD.</p>
+  <p style="color:var(--text2);font-size:13px;line-height:1.8;margin-bottom:20px">Stephen rules: Stephen Mooney Agency required · Effective date +7 days · Anti-theft Yes · Unstacked · 2018+ Comprehensive/Collision $1,000 and rental value required · Farmers roadside Standard / BW roadside Yes · Farmers only: Auto/Home/Condo Yes and remove Signal by Farmers · No fixed Bodily Injury, Property Damage, UM/UIM or PIP checks. Other checks follow Mirvat; 2017 and older remain PLPD.</p>
   <div class="upload-zone" id="uploadZone">
     <input type="file" id="fileInput" multiple accept=".pdf"/>
     <span class="upload-icon">📂</span>
@@ -313,6 +313,8 @@ function analyzeQuote(text,filename){
   const t=text;
   const errors=[];
   const warnings=[];
+  const agencyOk=/\bStephen\s+Mooney\s+Agency\b/i.test(t);
+  if(!agencyOk) errors.push("Agency must be Stephen Mooney Agency — missing or different agency");
 
   // ── Carrier & Quote Type Detection ──
   const isBristolSummary=/Bristol\s+West\s+Auto\s+quote\s+summary/i.test(t);
@@ -551,7 +553,7 @@ function analyzeQuote(text,filename){
   const status=errors.length>0?'fail':warnings.length>0?'warn':'pass';
   return{filename,name,quoteType,discountKind,monthlyEFT,vehicleCount,vehicles,drivers,
     errors,warnings,status,putInStop,homeData,azChecklist,
-    checks:{dateOk,dateDiff,prepDateStr,startDateStr,premiumOk}};
+    checks:{agencyOk,dateOk,dateDiff,prepDateStr,startDateStr,premiumOk}};
 }
 
 function parseDate(str){
@@ -969,6 +971,10 @@ function buildDetails(r){
   }
 
   return `<div class="row-details-grid">
+    <div class="detail-group">
+      <h4>Agency</h4>
+      ${ck(c.agencyOk,'Agency name','Stephen Mooney Agency')}
+    </div>
     <div class="detail-group">
       <h4>Stacking</h4>
       ${ck(!r.errors.some(e=>/Stack/i.test(e)),'Stacking','Unstacked / Non-stacking')}
