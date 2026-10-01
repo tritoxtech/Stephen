@@ -184,7 +184,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     </div>
   </div>
 
-  <p style="color:var(--text2);font-size:13px;line-height:1.8;margin-bottom:20px">Stephen rules: Stephen Mooney Agency required · Effective date +7 days · Anti-theft Yes · Unstacked · 2018+ Comprehensive/Collision $1,000 and rental value required · Farmers roadside Standard / BW roadside Yes · Farmers only: Auto/Home/Condo Yes and remove Signal by Farmers · No fixed Bodily Injury, Property Damage, UM/UIM or PIP checks. Other checks follow Mirvat; 2017 and older remain PLPD.</p>
+  <p style="color:var(--text2);font-size:13px;line-height:1.8;margin-bottom:20px">Stephen rules: Stephen Mooney Agency required · Effective date +7 days · Anti-theft Yes for 2018+ only · Unstacked · 2018+ Comprehensive/Collision $1,000 and rental value required · Farmers roadside Standard / BW roadside Yes · Farmers only: Auto/Home/Condo Yes and remove Signal by Farmers · No fixed Bodily Injury, Property Damage, UM/UIM or PIP checks. Other checks follow Mirvat; 2017 and older remain PLPD.</p>
   <div class="upload-zone" id="uploadZone">
     <input type="file" id="fileInput" multiple accept=".pdf"/>
     <span class="upload-icon">📂</span>
@@ -775,7 +775,8 @@ function checkVehicleCoverage(t,vehicles,errors,roadsideRequired){
         if(found===-1) break;
         const immediate=t.substring(found,found+220);
         const preview=t.substring(found,found+600);
-        const score=(/\bCoverage\b/i.test(immediate)?20:0)+[
+        const headingLine=t.substring(found).split('\n')[0];
+        const score=(/\bVIN\b/i.test(headingLine)?100:0)+(/\bCoverage\b/i.test(immediate)?20:0)+[
           /\bCoverage\b/i,
           /Liability\s+and\s+policy\s+coverages/i,
           /Comprehensive/i,
@@ -838,7 +839,7 @@ function checkVehicleCoverage(t,vehicles,errors,roadsideRequired){
     const appliedDiscounts=vehicleFullSection.match(/Applied\s+discounts\s*[:\-]?\s*([\s\S]*?)(?=\n\s*(?:Coverage\b|Vehicle\s+premium\b|Payment\s+plans\b|Page\s+\d+\b|(?:19|20)\d{2}\s+[A-Za-z])|$)/i);
     const antiApplied=!!appliedDiscounts && /\bAnti[\s\u2010-\u2015-]*theft\b/i.test(appliedDiscounts[1]) && !/\b(?:no|not|without)\s+Anti[\s\u2010-\u2015-]*theft\b/i.test(appliedDiscounts[1]);
     v.antiTheftOk=(!!antiMatch && /^\s*Yes\b/i.test(antiMatch[1])) || antiApplied || summaryAntiTheft;
-    if(!v.antiTheftOk) errors.push(`${short}: Anti-theft must be Yes or listed under Applied discounts`);
+    if(yr>=2018&&!v.antiTheftOk) errors.push(`${short}: Anti-theft must be Yes or listed under Applied discounts`);
     const rentalMatch=vehSection.match(/Rental\s+(?:reimbursement|coverage)\s*[:\-]?\s*([^\n]*(?:\n[^\n]*)?)/i);
     const rentalValue=rentalMatch?rentalMatch[1].trim().split(/\n|\b(?:Roadside|Anti[ -]?theft|Vehicle premium|Collision|Comprehensive)\b/i)[0]:'';
     v.rentalOk=!!rentalMatch && !/^(?:none|no|not\s+(?:included|selected)|declined|excluded|0\b|\$0\b|[-–—](?:\s|$))/i.test(rentalValue)
@@ -938,7 +939,7 @@ function buildDetails(r){
     const rErr=r.errors.some(e=>e.toLowerCase().includes(vKey)&&e.toLowerCase().includes('roadside'));
     vHTML+=`<div class="vehicle-item">
       <div class="v-name">${v.year} ${v.model.split(' ').slice(0,4).join(' ')}</div>
-      <div style="margin:5px 0"><span class="${v.antiTheftOk?'v-ok':'v-fail'}">${v.antiTheftOk?'✓':'✗'} Anti-theft Yes</span> ${isNew?`<span class="${v.rentalOk?'v-ok':'v-fail'}">${v.rentalOk?'✓':'✗'} Rental coverage value</span>`:''}</div>
+      <div style="margin:5px 0"><span class="${!isNew?'v-info':v.antiTheftOk?'v-ok':'v-fail'}">${!isNew?'Anti-theft: Not required':v.antiTheftOk?'✓ Anti-theft Yes':'✗ Anti-theft Yes'}</span> ${isNew?`<span class="${v.rentalOk?'v-ok':'v-fail'}">${v.rentalOk?'✓':'✗'} Rental coverage value</span>`:''}</div>
       <div class="v-tags"><span class="${isNew?'v-ok':'v-info'}">${isNew?'Full Coverage':'PLPD'}</span></div>
       <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;">
         <span class="${cErr?'v-fail':'v-ok'}">${isNew?(cErr?'✗ Comp missing':'✓ Comp $1,000'):'✓ No Comp'}</span>
