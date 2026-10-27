@@ -752,7 +752,7 @@ function checkVehicleCoverage(t,vehicles,errors,roadsideRequired){
   // Read them separately from the vehicle details, where coverage stays scoped.
   const summaryEnd=t.search(/Auto\s+quote\s+details/i);
   const summaryText=summaryEnd>=0?t.slice(0,summaryEnd):t.split(/(?:Farmers\s+)?(?:Home|Renters|Condo)\s+quote\s+(?:summary|details)/i)[0];
-  const summaryDiscounts=summaryText.match(/Applied\s+discounts\s*[:\-]?\s*([\s\S]*?)(?=\n\s*(?:Coverage\b|Covered\s+drivers\b|Payment\s+plans\b|Page\s+\d+\b|(?:Farmers|Bristol\s+West).*quote)|$)/i);
+  const summaryDiscounts=summaryText.match(/(?:Applied\s+discounts|Discounts\s*\/\s*Preferences)\s*[:\-]?\s*([\s\S]*?)(?=\n\s*(?:Coverage\b|Covered\s+drivers\b|Payment\s+plans\b|Page\s+\d+\b|(?:Farmers|Bristol\s+West).*quote)|$)/i);
   const summaryAntiTheft=!!summaryDiscounts && /\bAnti[\s\u2010-\u2015-]*theft\b/i.test(summaryDiscounts[1]) && !/\b(?:no|not|without)\s+Anti[\s\u2010-\u2015-]*theft\b/i.test(summaryDiscounts[1]);
 
   // Locate the most likely detailed coverage heading for each vehicle. A quote can
